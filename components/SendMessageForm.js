@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 class SendMessageForm extends React.Component {
   constructor() {
@@ -18,9 +19,13 @@ class SendMessageForm extends React.Component {
 
   handleSubmit(e) {
     e.preventDefault();
-    console.log(this.state.message);
 
     /** Send off the message */
+    this.props.sendMessage(this.state.message);
+
+    this.setState({
+      message: '',
+    });
   }
 
   render() {
@@ -39,5 +44,9 @@ class SendMessageForm extends React.Component {
     );
   }
 }
+
+SendMessageForm.propTypes = {
+  sendMessage: PropTypes.func.isRequired,
+};
 
 export default SendMessageForm;

@@ -22,6 +22,8 @@ class App extends React.Component {
     this.state = {
       messages: [],
     };
+    this.currentUser = null;
+    this.sendMessage = this.sendMessage.bind(this);
   }
 
   componentDidMount() {
@@ -29,7 +31,8 @@ class App extends React.Component {
       .connect()
       .then((currentUser) => {
         // The currentUser is our interface for talking with the Chat API.
-        currentUser.subscribeToRoom({
+        this.currentUser = currentUser;
+        this.currentUser.subscribeToRoom({
           roomId: 15276341,
           hooks: {
             onNewMessage: (message) => {
@@ -46,12 +49,19 @@ class App extends React.Component {
       });
   }
 
+  sendMessage(text) {
+    this.currentUser.sendMessage({
+      text,
+      roomId: 15276341,
+    });
+  }
+
   render() {
     return (
       <div className="app">
         <RoomList />
         <MessageList messages={this.state.messages} />
-        <SendMessageForm />
+        <SendMessageForm sendMessage={this.sendMessage} />
         <NewRoomForm />
       </div>
     );
