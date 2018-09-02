@@ -1,12 +1,18 @@
-import React from 'react'
+import React from 'react';
+import PropTypes from "prop-types";
 
-class Message extends React.Component {  
-    render() {
-        return (
-            <div className="message">
-            </div>
-        )
-    }
-}
+const Message = ({ username, text }) => {
+  return (
+    <div className="message">
+      <div className="message-username">{username}</div>
+      <div className="message-text">{text}</div>
+    </div>
+  );
+};
 
-export default Message
+Message.propTypes = {
+  username: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+};
+
+export default Message;

@@ -1165,29 +1165,24 @@ var _propTypes = __webpack_require__(32);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
+var _Message = __webpack_require__(40);
+
+var _Message2 = _interopRequireDefault(_Message);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var MessageList = function MessageList(_ref) {
   var messages = _ref.messages;
 
+  var item = function item(message, index) {
+    return _react2.default.createElement(_Message2.default, { key: index, username: message.senderId, text: message.text });
+  };
+
   return _react2.default.createElement(
-    "div",
-    { className: "message-list" },
+    'div',
+    { className: 'message-list' },
     messages.map(function (message, index) {
-      return _react2.default.createElement(
-        "div",
-        { key: index, className: "message" },
-        _react2.default.createElement(
-          "div",
-          { className: "message-username" },
-          message.senderId
-        ),
-        _react2.default.createElement(
-          "div",
-          { className: "message-text" },
-          message.text
-        )
-      );
+      return item(message, index);
     })
   );
 };
@@ -21603,6 +21598,54 @@ var instanceLocator = 'v1:us1:fa2f9b29-4a8b-4401-9c64-92d01d6a6a75';
 
 exports.tokenUrl = tokenUrl;
 exports.instanceLocator = instanceLocator;
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _react = __webpack_require__(1);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _propTypes = __webpack_require__(32);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Message = function Message(_ref) {
+  var username = _ref.username,
+      text = _ref.text;
+
+  return _react2.default.createElement(
+    "div",
+    { className: "message" },
+    _react2.default.createElement(
+      "div",
+      { className: "message-username" },
+      username
+    ),
+    _react2.default.createElement(
+      "div",
+      { className: "message-text" },
+      text
+    )
+  );
+};
+
+Message.propTypes = {
+  username: _propTypes2.default.string.isRequired,
+  text: _propTypes2.default.string.isRequired
+};
+
+exports.default = Message;
 
 /***/ })
 /******/ ]);
