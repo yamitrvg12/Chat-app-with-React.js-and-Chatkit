@@ -1056,10 +1056,13 @@ var App = function (_React$Component) {
     _this.state = {
       messages: [],
       joinableRooms: [],
-      joinedRooms: []
+      joinedRooms: [],
+      roomId: null
     };
     _this.currentUser = null;
     _this.sendMessage = _this.sendMessage.bind(_this);
+    _this.subscribeToRoom = _this.subscribeToRoom.bind(_this);
+    _this.getRooms = _this.getRooms.bind(_this);
     return _this;
   }
 
@@ -1071,29 +1074,50 @@ var App = function (_React$Component) {
       chatManager.connect().then(function (currentUser) {
         // The currentUser is our interface for talking with the Chat API.
         _this2.currentUser = currentUser;
-
-        _this2.currentUser.getJoinableRooms().then(function (joinableRooms) {
-          _this2.setState({
-            joinableRooms: joinableRooms,
-            joinedRooms: _this2.currentUser.rooms
-          });
-        }).catch(function (error) {
-          return console.log('Error on  joinableRooms', error);
-        });
-
-        _this2.currentUser.subscribeToRoom({
-          roomId: 15276341,
-          hooks: {
-            onNewMessage: function onNewMessage(message) {
-              _this2.setState({
-                // new array (copy) with NO reference to the previous
-                messages: [].concat(_toConsumableArray(_this2.state.messages), [message])
-              });
-            }
-          }
-        });
+        _this2.getRooms();
       }).catch(function (error) {
         return console.log('Error on Connecting ', error);
+      });
+    }
+  }, {
+    key: 'getRooms',
+    value: function getRooms() {
+      var _this3 = this;
+
+      this.currentUser.getJoinableRooms().then(function (joinableRooms) {
+        _this3.setState({
+          joinableRooms: joinableRooms,
+          joinedRooms: _this3.currentUser.rooms
+        });
+      }).catch(function (error) {
+        return console.log('Error on  joinableRooms', error);
+      });
+    }
+  }, {
+    key: 'subscribeToRoom',
+    value: function subscribeToRoom(roomId) {
+      var _this4 = this;
+
+      this.setState({
+        messages: []
+      });
+      this.currentUser.subscribeToRoom({
+        roomId: roomId,
+        hooks: {
+          onNewMessage: function onNewMessage(message) {
+            _this4.setState({
+              // new array (copy) with NO reference to the previous
+              messages: [].concat(_toConsumableArray(_this4.state.messages), [message])
+            });
+          }
+        }
+      }).then(function (room) {
+        _this4.setState({
+          roomId: room.id
+        });
+        _this4.getRooms();
+      }).catch(function (error) {
+        return console.log('Error on subscribing to room: ', error);
       });
     }
   }, {
@@ -1101,7 +1125,7 @@ var App = function (_React$Component) {
     value: function sendMessage(text) {
       this.currentUser.sendMessage({
         text: text,
-        roomId: 15276341
+        roomId: this.state.roomId
       });
     }
   }, {
@@ -1110,7 +1134,7 @@ var App = function (_React$Component) {
       return _react2.default.createElement(
         'div',
         { className: 'app' },
-        _react2.default.createElement(_RoomList2.default, { rooms: [].concat(_toConsumableArray(this.state.joinableRooms), _toConsumableArray(this.state.joinedRooms)) }),
+        _react2.default.createElement(_RoomList2.default, { subscribeToRoom: this.subscribeToRoom, rooms: [].concat(_toConsumableArray(this.state.joinableRooms), _toConsumableArray(this.state.joinedRooms)) }),
         _react2.default.createElement(_MessageList2.default, { messages: this.state.messages }),
         _react2.default.createElement(_SendMessageForm2.default, { sendMessage: this.sendMessage }),
         _react2.default.createElement(_NewRoomForm2.default, null)
@@ -1301,7 +1325,8 @@ var _propTypes2 = _interopRequireDefault(_propTypes);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var RoomList = function RoomList(_ref) {
-  var rooms = _ref.rooms;
+  var rooms = _ref.rooms,
+      subscribeToRoom = _ref.subscribeToRoom;
 
   return _react2.default.createElement(
     'div',
@@ -1318,7 +1343,13 @@ var RoomList = function RoomList(_ref) {
         return _react2.default.createElement(
           'li',
           { key: room.id, className: 'room' },
-          room.name
+          _react2.default.createElement(
+            'button',
+            { onClick: function onClick() {
+                subscribeToRoom(room.id);
+              } },
+            room.name
+          )
         );
       })
     )
@@ -1326,7 +1357,8 @@ var RoomList = function RoomList(_ref) {
 };
 
 RoomList.propTypes = {
-  rooms: _propTypes2.default.array.isRequired
+  rooms: _propTypes2.default.array.isRequired,
+  subscribeToRoom: _propTypes2.default.func.isRequired
 };
 
 exports.default = RoomList;
