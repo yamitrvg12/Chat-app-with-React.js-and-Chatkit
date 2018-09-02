@@ -1054,7 +1054,9 @@ var App = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this));
 
     _this.state = {
-      messages: []
+      messages: [],
+      joinableRooms: [],
+      joinedRooms: []
     };
     _this.currentUser = null;
     _this.sendMessage = _this.sendMessage.bind(_this);
@@ -1069,6 +1071,16 @@ var App = function (_React$Component) {
       chatManager.connect().then(function (currentUser) {
         // The currentUser is our interface for talking with the Chat API.
         _this2.currentUser = currentUser;
+
+        _this2.currentUser.getJoinableRooms().then(function (joinableRooms) {
+          _this2.setState({
+            joinableRooms: joinableRooms,
+            joinedRooms: _this2.currentUser.rooms
+          });
+        }).catch(function (error) {
+          return console.log('Error on  joinableRooms', error);
+        });
+
         _this2.currentUser.subscribeToRoom({
           roomId: 15276341,
           hooks: {
@@ -1081,7 +1093,7 @@ var App = function (_React$Component) {
           }
         });
       }).catch(function (error) {
-        console.log('Error ', error);
+        return console.log('Error on Connecting ', error);
       });
     }
   }, {
@@ -1098,7 +1110,7 @@ var App = function (_React$Component) {
       return _react2.default.createElement(
         'div',
         { className: 'app' },
-        _react2.default.createElement(_RoomList2.default, null),
+        _react2.default.createElement(_RoomList2.default, { rooms: [].concat(_toConsumableArray(this.state.joinableRooms), _toConsumableArray(this.state.joinedRooms)) }),
         _react2.default.createElement(_MessageList2.default, { messages: this.state.messages }),
         _react2.default.createElement(_SendMessageForm2.default, { sendMessage: this.sendMessage }),
         _react2.default.createElement(_NewRoomForm2.default, null)
@@ -1278,46 +1290,44 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = __webpack_require__(32);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var RoomList = function RoomList(_ref) {
+  var rooms = _ref.rooms;
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+  return _react2.default.createElement(
+    'div',
+    { className: 'rooms-list' },
+    _react2.default.createElement(
+      'ul',
+      null,
+      _react2.default.createElement(
+        'h3',
+        null,
+        'Your Rooms: '
+      ),
+      rooms.map(function (room) {
+        return _react2.default.createElement(
+          'li',
+          { key: room.id, className: 'room' },
+          room.name
+        );
+      })
+    )
+  );
+};
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var RoomList = function (_React$Component) {
-  _inherits(RoomList, _React$Component);
-
-  function RoomList() {
-    _classCallCheck(this, RoomList);
-
-    return _possibleConstructorReturn(this, (RoomList.__proto__ || Object.getPrototypeOf(RoomList)).apply(this, arguments));
-  }
-
-  _createClass(RoomList, [{
-    key: "render",
-    value: function render() {
-      return _react2.default.createElement(
-        "div",
-        { className: "rooms-list" },
-        _react2.default.createElement(
-          "div",
-          { className: "help-text" },
-          "RoomList"
-        )
-      );
-    }
-  }]);
-
-  return RoomList;
-}(_react2.default.Component);
+RoomList.propTypes = {
+  rooms: _propTypes2.default.array.isRequired
+};
 
 exports.default = RoomList;
 

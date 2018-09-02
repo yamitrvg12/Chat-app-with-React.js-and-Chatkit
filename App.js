@@ -21,6 +21,8 @@ class App extends React.Component {
     super(); // we are calling the constructor function in the React.Component
     this.state = {
       messages: [],
+      joinableRooms: [],
+      joinedRooms: [],
     };
     this.currentUser = null;
     this.sendMessage = this.sendMessage.bind(this);
@@ -32,6 +34,16 @@ class App extends React.Component {
       .then((currentUser) => {
         // The currentUser is our interface for talking with the Chat API.
         this.currentUser = currentUser;
+
+        this.currentUser.getJoinableRooms()
+          .then((joinableRooms) => {
+            this.setState({
+              joinableRooms,
+              joinedRooms: this.currentUser.rooms,
+            });
+          })
+          .catch(error => console.log('Error on  joinableRooms', error));
+
         this.currentUser.subscribeToRoom({
           roomId: 15276341,
           hooks: {
@@ -44,9 +56,7 @@ class App extends React.Component {
           },
         });
       })
-      .catch((error) => {
-        console.log('Error ', error);
-      });
+      .catch(error => console.log('Error on Connecting ', error));
   }
 
   sendMessage(text) {
@@ -59,7 +69,7 @@ class App extends React.Component {
   render() {
     return (
       <div className="app">
-        <RoomList />
+        <RoomList rooms={[...this.state.joinableRooms, ...this.state.joinedRooms]} />
         <MessageList messages={this.state.messages} />
         <SendMessageForm sendMessage={this.sendMessage} />
         <NewRoomForm />
