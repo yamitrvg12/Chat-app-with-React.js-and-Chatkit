@@ -17,6 +17,13 @@ const chatManager = new ChatManager({
 });
 
 class App extends React.Component {
+  constructor() {
+    super(); // we are calling the constructor function in the React.Component
+    this.state = {
+      messages: [],
+    };
+  }
+
   componentDidMount() {
     chatManager
       .connect()
@@ -26,7 +33,10 @@ class App extends React.Component {
           roomId: 15276341,
           hooks: {
             onNewMessage: (message) => {
-              console.log(message.text);
+              this.setState({
+                // new array (copy) with NO reference to the previous
+                messages: [...this.state.messages, message],
+              });
             },
           },
         });
@@ -40,7 +50,7 @@ class App extends React.Component {
     return (
       <div className="app">
         <RoomList />
-        <MessageList />
+        <MessageList messages={this.state.messages} />
         <SendMessageForm />
         <NewRoomForm />
       </div>

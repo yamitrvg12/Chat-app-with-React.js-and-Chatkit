@@ -1,24 +1,10 @@
 import React from 'react';
+import PropTypes from "prop-types";
 
-const DUMMY_DATA = [
-  {
-    senderId: 'perborgen',
-    text: 'Hey, how is it going?',
-  },
-  {
-    senderId: 'janedoe',
-    text: 'Great! How about you?',
-  },
-  {
-    senderId: 'perborgen',
-    text: 'Good to hear! I am great as well',
-  },
-];
-
-const MessageList = () => {
+const MessageList = ({ messages }) => {
   return (
     <div className="message-list">
-      {DUMMY_DATA.map((message, index) => {
+      {messages.map((message, index) => {
         return (
           <div key={index} className="message">
             <div className="message-username">{message.senderId}</div>
@@ -28,6 +14,10 @@ const MessageList = () => {
       })}
     </div>
   );
+};
+
+MessageList.propTypes = {
+  messages: PropTypes.array.isRequired,
 };
 
 export default MessageList;

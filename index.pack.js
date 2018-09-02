@@ -1026,6 +1026,8 @@ var _config = __webpack_require__(39);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -1048,19 +1050,30 @@ var App = function (_React$Component) {
   function App() {
     _classCallCheck(this, App);
 
-    return _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).apply(this, arguments));
+    // we are calling the constructor function in the React.Component
+    var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this));
+
+    _this.state = {
+      messages: []
+    };
+    return _this;
   }
 
   _createClass(App, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
+      var _this2 = this;
+
       chatManager.connect().then(function (currentUser) {
         // The currentUser is our interface for talking with the Chat API.
         currentUser.subscribeToRoom({
           roomId: 15276341,
           hooks: {
             onNewMessage: function onNewMessage(message) {
-              console.log(message.text);
+              _this2.setState({
+                // new array (copy) with NO reference to the previous
+                messages: [].concat(_toConsumableArray(_this2.state.messages), [message])
+              });
             }
           }
         });
@@ -1075,7 +1088,7 @@ var App = function (_React$Component) {
         'div',
         { className: 'app' },
         _react2.default.createElement(_RoomList2.default, null),
-        _react2.default.createElement(_MessageList2.default, null),
+        _react2.default.createElement(_MessageList2.default, { messages: this.state.messages }),
         _react2.default.createElement(_SendMessageForm2.default, null),
         _react2.default.createElement(_NewRoomForm2.default, null)
       );
@@ -1148,40 +1161,39 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = __webpack_require__(32);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var DUMMY_DATA = [{
-  senderId: 'perborgen',
-  text: 'Hey, how is it going?'
-}, {
-  senderId: 'janedoe',
-  text: 'Great! How about you?'
-}, {
-  senderId: 'perborgen',
-  text: 'Good to hear! I am great as well'
-}];
+var MessageList = function MessageList(_ref) {
+  var messages = _ref.messages;
 
-var MessageList = function MessageList() {
   return _react2.default.createElement(
-    'div',
-    { className: 'message-list' },
-    DUMMY_DATA.map(function (message, index) {
+    "div",
+    { className: "message-list" },
+    messages.map(function (message, index) {
       return _react2.default.createElement(
-        'div',
-        { key: index, className: 'message' },
+        "div",
+        { key: index, className: "message" },
         _react2.default.createElement(
-          'div',
-          { className: 'message-username' },
+          "div",
+          { className: "message-username" },
           message.senderId
         ),
         _react2.default.createElement(
-          'div',
-          { className: 'message-text' },
+          "div",
+          { className: "message-text" },
           message.text
         )
       );
     })
   );
+};
+
+MessageList.propTypes = {
+  messages: _propTypes2.default.array.isRequired
 };
 
 exports.default = MessageList;
