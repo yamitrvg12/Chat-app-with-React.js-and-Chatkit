@@ -1063,6 +1063,7 @@ var App = function (_React$Component) {
     _this.sendMessage = _this.sendMessage.bind(_this);
     _this.subscribeToRoom = _this.subscribeToRoom.bind(_this);
     _this.getRooms = _this.getRooms.bind(_this);
+    _this.createRoom = _this.createRoom.bind(_this);
     return _this;
   }
 
@@ -1129,6 +1130,19 @@ var App = function (_React$Component) {
       });
     }
   }, {
+    key: 'createRoom',
+    value: function createRoom(roomName) {
+      var _this5 = this;
+
+      this.currentUser.createRoom({
+        name: roomName
+      }).then(function (room) {
+        return _this5.subscribeToRoom(room.id);
+      }).catch(function (error) {
+        return console.log('Error creating room ' + error);
+      });
+    }
+  }, {
     key: 'render',
     value: function render() {
       return _react2.default.createElement(
@@ -1139,9 +1153,15 @@ var App = function (_React$Component) {
           subscribeToRoom: this.subscribeToRoom,
           rooms: [].concat(_toConsumableArray(this.state.joinableRooms), _toConsumableArray(this.state.joinedRooms))
         }),
-        _react2.default.createElement(_MessageList2.default, { messages: this.state.messages }),
-        _react2.default.createElement(_SendMessageForm2.default, { sendMessage: this.sendMessage }),
-        _react2.default.createElement(_NewRoomForm2.default, null)
+        _react2.default.createElement(_MessageList2.default, {
+          roomId: this.state.roomId,
+          messages: this.state.messages
+        }),
+        _react2.default.createElement(_SendMessageForm2.default, {
+          disabled: !this.state.roomId,
+          sendMessage: this.sendMessage
+        }),
+        _react2.default.createElement(_NewRoomForm2.default, { createRoom: this.createRoom })
       );
     }
   }]);
@@ -1214,10 +1234,6 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = __webpack_require__(16);
-
-var _reactDom2 = _interopRequireDefault(_reactDom);
-
 var _propTypes = __webpack_require__(32);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
@@ -1246,7 +1262,9 @@ var MessageList = function (_React$Component) {
   _createClass(MessageList, [{
     key: 'componentWillUpdate',
     value: function componentWillUpdate() {
-      this.shouldScrollToBottom = this.node.scrollTop + this.node.clientHeight + 300 >= this.node.scrollHeight;
+      if (this.props.roomId) {
+        this.shouldScrollToBottom = this.node.scrollTop + this.node.clientHeight + 300 >= this.node.scrollHeight;
+      }
     }
   }, {
     key: 'componentDidUpdate',
@@ -1259,6 +1277,18 @@ var MessageList = function (_React$Component) {
     key: 'render',
     value: function render() {
       var _this2 = this;
+
+      if (!this.props.roomId) {
+        return _react2.default.createElement(
+          'div',
+          { className: 'message-list' },
+          _react2.default.createElement(
+            'div',
+            { className: 'join-room' },
+            '\u2190 Join a room!'
+          )
+        );
+      }
 
       var item = function item(message, index) {
         return _react2.default.createElement(_Message2.default, {
@@ -1283,8 +1313,13 @@ var MessageList = function (_React$Component) {
   return MessageList;
 }(_react2.default.Component);
 
+MessageList.defaultProps = {
+  roomId: null
+};
+
 MessageList.propTypes = {
-  messages: _propTypes2.default.array.isRequired
+  messages: _propTypes2.default.array.isRequired,
+  roomId: _propTypes2.default.number
 };
 
 exports.default = MessageList;
@@ -1306,6 +1341,10 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _propTypes = __webpack_require__(32);
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1320,27 +1359,52 @@ var NewRoomForm = function (_React$Component) {
   function NewRoomForm() {
     _classCallCheck(this, NewRoomForm);
 
-    return _possibleConstructorReturn(this, (NewRoomForm.__proto__ || Object.getPrototypeOf(NewRoomForm)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (NewRoomForm.__proto__ || Object.getPrototypeOf(NewRoomForm)).call(this));
+
+    _this.state = {
+      roomName: ''
+    };
+    _this.handleChange = _this.handleChange.bind(_this);
+    _this.handleSubmit = _this.handleSubmit.bind(_this);
+    return _this;
   }
 
   _createClass(NewRoomForm, [{
-    key: "render",
+    key: 'handleChange',
+    value: function handleChange(e) {
+      this.setState({
+        roomName: e.target.value
+      });
+    }
+  }, {
+    key: 'handleSubmit',
+    value: function handleSubmit(e) {
+      e.preventDefault();
+      this.props.createRoom(this.state.roomName);
+      this.setState({
+        roomName: ''
+      });
+    }
+  }, {
+    key: 'render',
     value: function render() {
       return _react2.default.createElement(
-        "div",
-        { className: "new-room-form" },
+        'div',
+        { className: 'new-room-form' },
         _react2.default.createElement(
-          "form",
-          null,
-          _react2.default.createElement("input", {
-            type: "text",
-            placeholder: "NewRoomForm",
+          'form',
+          { onSubmit: this.handleSubmit },
+          _react2.default.createElement('input', {
+            onChange: this.handleChange,
+            value: this.state.roomName,
+            type: 'text',
+            placeholder: 'Create a room',
             required: true
           }),
           _react2.default.createElement(
-            "button",
-            { id: "create-room-btn", type: "submit" },
-            "+"
+            'button',
+            { id: 'create-room-btn', type: 'submit' },
+            '+'
           )
         )
       );
@@ -1349,6 +1413,10 @@ var NewRoomForm = function (_React$Component) {
 
   return NewRoomForm;
 }(_react2.default.Component);
+
+NewRoomForm.propTypes = {
+  createRoom: _propTypes2.default.func.isRequired
+};
 
 exports.default = NewRoomForm;
 
@@ -1493,6 +1561,7 @@ var SendMessageForm = function (_React$Component) {
           className: 'send-message-form'
         },
         _react2.default.createElement('input', {
+          disabled: this.props.disabled,
           onChange: this.handleChange,
           value: this.state.message,
           placeholder: 'SendMessageForm',
@@ -1506,7 +1575,8 @@ var SendMessageForm = function (_React$Component) {
 }(_react2.default.Component);
 
 SendMessageForm.propTypes = {
-  sendMessage: _propTypes2.default.func.isRequired
+  sendMessage: _propTypes2.default.func.isRequired,
+  disabled: _propTypes2.default.bool.isRequired
 };
 
 exports.default = SendMessageForm;

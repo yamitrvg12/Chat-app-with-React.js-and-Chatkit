@@ -35,6 +35,7 @@ class SendMessageForm extends React.Component {
         className="send-message-form"
       >
         <input
+          disabled={this.props.disabled}
           onChange={this.handleChange}
           value={this.state.message}
           placeholder="SendMessageForm"
@@ -47,6 +48,7 @@ class SendMessageForm extends React.Component {
 
 SendMessageForm.propTypes = {
   sendMessage: PropTypes.func.isRequired,
+  disabled: PropTypes.bool.isRequired,
 };
 
 export default SendMessageForm;
