@@ -1134,7 +1134,11 @@ var App = function (_React$Component) {
       return _react2.default.createElement(
         'div',
         { className: 'app' },
-        _react2.default.createElement(_RoomList2.default, { subscribeToRoom: this.subscribeToRoom, rooms: [].concat(_toConsumableArray(this.state.joinableRooms), _toConsumableArray(this.state.joinedRooms)) }),
+        _react2.default.createElement(_RoomList2.default, {
+          roomId: this.state.roomId,
+          subscribeToRoom: this.subscribeToRoom,
+          rooms: [].concat(_toConsumableArray(this.state.joinableRooms), _toConsumableArray(this.state.joinedRooms))
+        }),
         _react2.default.createElement(_MessageList2.default, { messages: this.state.messages }),
         _react2.default.createElement(_SendMessageForm2.default, { sendMessage: this.sendMessage }),
         _react2.default.createElement(_NewRoomForm2.default, null)
@@ -1324,10 +1328,16 @@ var _propTypes2 = _interopRequireDefault(_propTypes);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 var RoomList = function RoomList(_ref) {
   var rooms = _ref.rooms,
-      subscribeToRoom = _ref.subscribeToRoom;
+      subscribeToRoom = _ref.subscribeToRoom,
+      roomId = _ref.roomId;
 
+  var orderedRooms = [].concat(_toConsumableArray(rooms)).sort(function (a, b) {
+    return a.id - b.id;
+  });
   return _react2.default.createElement(
     'div',
     { className: 'rooms-list' },
@@ -1339,10 +1349,11 @@ var RoomList = function RoomList(_ref) {
         null,
         'Your Rooms: '
       ),
-      rooms.map(function (room) {
+      orderedRooms.map(function (room) {
+        var active = roomId === room.id ? 'active' : '';
         return _react2.default.createElement(
           'li',
-          { key: room.id, className: 'room' },
+          { key: room.id, className: 'room ' + active },
           _react2.default.createElement(
             'button',
             { onClick: function onClick() {
