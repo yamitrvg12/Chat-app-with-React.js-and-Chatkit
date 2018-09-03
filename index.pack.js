@@ -1208,9 +1208,15 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
+
+var _reactDom = __webpack_require__(16);
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
 
 var _propTypes = __webpack_require__(32);
 
@@ -1222,21 +1228,60 @@ var _Message2 = _interopRequireDefault(_Message);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var MessageList = function MessageList(_ref) {
-  var messages = _ref.messages;
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-  var item = function item(message, index) {
-    return _react2.default.createElement(_Message2.default, { key: index, username: message.senderId, text: message.text });
-  };
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-  return _react2.default.createElement(
-    'div',
-    { className: 'message-list' },
-    messages.map(function (message, index) {
-      return item(message, index);
-    })
-  );
-};
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var MessageList = function (_React$Component) {
+  _inherits(MessageList, _React$Component);
+
+  function MessageList() {
+    _classCallCheck(this, MessageList);
+
+    return _possibleConstructorReturn(this, (MessageList.__proto__ || Object.getPrototypeOf(MessageList)).apply(this, arguments));
+  }
+
+  _createClass(MessageList, [{
+    key: 'componentWillUpdate',
+    value: function componentWillUpdate() {
+      this.shouldScrollToBottom = this.node.scrollTop + this.node.clientHeight + 300 >= this.node.scrollHeight;
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate() {
+      if (this.shouldScrollToBottom) {
+        this.node.scrollTop = this.node.scrollHeight;
+      }
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this2 = this;
+
+      var item = function item(message, index) {
+        return _react2.default.createElement(_Message2.default, {
+          key: index,
+          username: message.senderId,
+          text: message.text
+        });
+      };
+
+      return _react2.default.createElement(
+        'div',
+        { ref: function ref(node) {
+            _this2.node = node;
+          }, className: 'message-list' },
+        this.props.messages.map(function (message, index) {
+          return item(message, index);
+        })
+      );
+    }
+  }]);
+
+  return MessageList;
+}(_react2.default.Component);
 
 MessageList.propTypes = {
   messages: _propTypes2.default.array.isRequired
